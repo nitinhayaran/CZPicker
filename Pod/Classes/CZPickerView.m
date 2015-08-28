@@ -28,11 +28,12 @@ typedef void (^CZDismissCompletionCallback)(void);
 @property UIView *headerView;
 @property UIView *footerview;
 @property UITableView *tableView;
-@property NSIndexPath *selectedIndexPath;
 @property NSMutableArray *selectedRows;
 @end
 
 @implementation CZPickerView
+
+@synthesize selectedIndexPath;
 
 - (id)initWithHeaderTitle:(NSString *)headerTitle
         cancelButtonTitle:(NSString *)cancelButtonTitle

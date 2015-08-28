@@ -70,6 +70,8 @@
 
 @property id<CZPickerViewDataSource> dataSource;
 
+@property NSIndexPath *selectedIndexPath;
+
 /** whether to show footer (including confirm and cancel buttons), default NO */
 @property BOOL needFooterView;
 
