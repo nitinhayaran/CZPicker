@@ -9,7 +9,7 @@
 
 #define CZP_FOOTER_HEIGHT 44.0
 #define CZP_HEADER_HEIGHT 44.0
-#if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_7_1 
+#if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_7_1
 #define CZP_BACKGROUND_ALPHA 0.9
 #else
 #define CZP_BACKGROUND_ALPHA 0.3
@@ -28,12 +28,12 @@ typedef void (^CZDismissCompletionCallback)(void);
 @property UIView *headerView;
 @property UIView *footerview;
 @property UITableView *tableView;
-@property NSMutableArray *selectedRows;
+@property NSIndexPath *selectedIndexPath;
 @end
 
 @implementation CZPickerView
 
-@synthesize selectedIndexPath;
+@synthesize selectedRows;
 
 - (id)initWithHeaderTitle:(NSString *)headerTitle
         cancelButtonTitle:(NSString *)cancelButtonTitle
@@ -49,22 +49,22 @@ typedef void (^CZDismissCompletionCallback)(void);
         self.tapBackgroundToDismiss = YES;
         self.needFooterView = NO;
         self.allowMultipleSelection = NO;
-        
+
         self.confirmButtonTitle = confirmButtonTitle;
         self.cancelButtonTitle = cancelButtonTitle;
-        
+
         self.headerTitle = headerTitle ? headerTitle : @"";
         self.headerTitleColor = [UIColor whiteColor];
         self.headerBackgroundColor = [UIColor colorWithRed:56.0/255 green:185.0/255 blue:158.0/255 alpha:1];
-        
+
         self.cancelButtonNormalColor = [UIColor colorWithRed:59.0/255 green:72/255.0 blue:5.0/255 alpha:1];
         self.cancelButtonHighlightedColor = [UIColor grayColor];
         self.cancelButtonBackgroundColor = [UIColor colorWithRed:236.0/255 green:240/255.0 blue:241.0/255 alpha:1];
-        
+
         self.confirmButtonNormalColor = [UIColor whiteColor];
         self.confirmButtonHighlightedColor = [UIColor colorWithRed:236.0/255 green:240/255.0 blue:241.0/255 alpha:1];
         self.confirmButtonBackgroundColor = [UIColor colorWithRed:56.0/255 green:185.0/255 blue:158.0/255 alpha:1];
-        
+
         CGRect rect= [UIScreen mainScreen].bounds;
         self.frame = rect;
     }
@@ -76,50 +76,50 @@ typedef void (^CZDismissCompletionCallback)(void);
         self.backgroundDimmingView = [self buildBackgroundDimmingView];
         [self addSubview:self.backgroundDimmingView];
     }
-    
+
     self.containerView = [self buildContainerView];
     [self addSubview:self.containerView];
-    
+
     self.tableView = [self buildTableView];
     [self.containerView addSubview:self.tableView];
-    
+
     self.headerView = [self buildHeaderView];
     [self.containerView addSubview:self.headerView];
-    
+
     self.footerview = [self buildFooterView];
     [self.containerView addSubview:self.footerview];
-    
+
     CGRect frame = self.containerView.frame;
-    
+
     self.containerView.frame = CGRectMake(frame.origin.x,
                                           frame.origin.y,
                                           frame.size.width,
                                           self.headerView.frame.size.height + self.tableView.frame.size.height + self.footerview.frame.size.height);
     self.containerView.center = CGPointMake(self.center.x, self.center.y + self.frame.size.height);
-    
+
 }
 
 - (void)performContainerAnimation {
-    
+
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.7f initialSpringVelocity:3.0f options:UIViewAnimationOptionAllowAnimatedContent animations:^{
         self.containerView.center = self.center;
     } completion:^(BOOL finished) {
-        
+
     }];
 }
 
 - (void)show{
-    
+
     if(self.allowMultipleSelection && !self.needFooterView){
         self.needFooterView = self.allowMultipleSelection;
     }
-    
+
     UIWindow *mainWindow = [[[UIApplication sharedApplication] delegate] window];
     self.frame = mainWindow.frame;
     [mainWindow addSubview:self];
     [self setupSubviews];
     [self performContainerAnimation];
-    
+
     [UIView animateWithDuration:0.3f animations:^{
         self.backgroundDimmingView.alpha = CZP_BACKGROUND_ALPHA;
     }];
@@ -130,7 +130,7 @@ typedef void (^CZDismissCompletionCallback)(void);
         self.containerView.center = CGPointMake(self.center.x, self.center.y + self.frame.size.height);
     }completion:^(BOOL finished) {
     }];
-    
+
     [UIView animateWithDuration:0.3f animations:^{
         self.backgroundDimmingView.alpha = 0.0;
     } completion:^(BOOL finished) {
@@ -174,7 +174,7 @@ typedef void (^CZDismissCompletionCallback)(void);
 }
 
 - (UIView *)buildBackgroundDimmingView{
-    
+
     UIView *bgView;
     //blur effect for iOS8
     CGFloat frameHeight = self.frame.size.height;
@@ -209,7 +209,7 @@ typedef void (^CZDismissCompletionCallback)(void);
                                 CZP_FOOTER_HEIGHT);
     CGRect leftRect = CGRectMake(0,0, newRect.size.width /2, CZP_FOOTER_HEIGHT);
     CGRect rightRect = CGRectMake(newRect.size.width /2,0, newRect.size.width /2, CZP_FOOTER_HEIGHT);
-    
+
     UIView *view = [[UIView alloc] initWithFrame:newRect];
     UIButton *cancelButton = [[UIButton alloc] initWithFrame:leftRect];
     [cancelButton setTitle:self.cancelButtonTitle forState:UIControlStateNormal];
@@ -219,7 +219,7 @@ typedef void (^CZDismissCompletionCallback)(void);
     cancelButton.backgroundColor = self.cancelButtonBackgroundColor;
     [cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [view addSubview:cancelButton];
-    
+
     UIButton *confirmButton = [[UIButton alloc] initWithFrame:rightRect];
     [confirmButton setTitle:self.confirmButtonTitle forState:UIControlStateNormal];
     [confirmButton setTitleColor:self.confirmButtonNormalColor forState:UIControlStateNormal];
@@ -347,7 +347,7 @@ typedef void (^CZDismissCompletionCallback)(void);
         if ( range.location != NSNotFound ) {
             [set addObject:@"Portrait"];
         }
-        
+
         range = [o rangeOfString:@"Landscape"];
         if ( range.location != NSNotFound ) {
             [set addObject:@"Landscape"];
@@ -392,7 +392,7 @@ typedef void (^CZDismissCompletionCallback)(void);
     self.frame = [UIScreen mainScreen].bounds;
     for(UIView *v in self.subviews){
         if([v isEqual:self.backgroundDimmingView]) continue;
-        
+
         [UIView animateWithDuration:0.2f animations:^{
             v.alpha = 0.0;
         } completion:^(BOOL finished) {
